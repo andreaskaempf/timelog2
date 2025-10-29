@@ -1,0 +1,27 @@
+{{ template "header.html" . }}
+
+  <h1>
+    Projects
+    <a href="/EditProject/0" class="menu-button">Create project</a>
+  </h1>
+
+  <table>
+
+    <tr>
+        <th>Client</th>
+        <th>Name</th>
+        <th>Description</th>
+    </tr>
+
+    {{ $lastDate := "" }}  <!-- for date breaks -->
+    {{ range .projects }}
+    <tr>
+        <th>{{ .Client }}</th>
+        <th>{{ .Name }}</th>
+        <th>{{ .Description }}</th>
+    </tr>
+    {{ end }}
+
+  </table>
+
+{{ template "footer.html" .}}
