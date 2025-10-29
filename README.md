@@ -2,7 +2,7 @@
 
 This will be a Go web app to manage projects, time on projects, and contacts.
 Database schema is based on the old 
-(Python version)[https://github.com/andreaskaempf/timelog], but completely
+[Python version](https://github.com/andreaskaempf/timelog), but completely
 rewritten in Go.
 
 To install
@@ -12,7 +12,7 @@ To install
   couple of changes to bring to new schema, otherwise create a new timelog.db
   using schema.txt (TODO: instructions)
 * `go get` to install dependencies
-* Download (Bulma)[https://bulma.io] and install it into the static directory
+* Download [Bulma](https://bulma.io) and install it into the static directory
 * `go build` to build executable
 * `./timelog` to start the app server
 * Browse to http://localhost:8222
