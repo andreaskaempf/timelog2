@@ -1,0 +1,20 @@
+{{ template "header.html" . }}
+
+  <h1 class="title">
+    Activity Log
+    <a href="/edit_log/0" class="button is-small is-primary" style="float: right" title="Add log entry">+</a>
+  </h1>
+
+  <table class="table">
+
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Project</th>
+        <th>Hours</th>
+    </tr>
+    </thead>
+
+  </table>
+
+{{ template "footer.html" .}}

@@ -42,7 +42,10 @@ func main() {
 	r.GET("/Logout", logout)*/
 
 	// Project pages
-	r.GET("/Projects", showProjects)
+	r.GET("/", showProjects)
+	r.GET("/projects", showProjects)
+	r.GET("/log", showLog)
+
 	/*r.GET("/Person/:id", showPerson)
 	r.GET("/EditPerson/:id", editPerson)
 	r.POST("/update_person", savePerson)
