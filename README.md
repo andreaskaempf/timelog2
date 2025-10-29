@@ -14,7 +14,7 @@ To install
 * `go get` to install dependencies
 * Download [Bulma](https://bulma.io) and install it into the static directory
 * `go build` to build executable
-* `./timelog` to start the app server
+* `./timelog2` to start the app server
 * Browse to http://localhost:8222
 
 AK, Oct-Nov 2025

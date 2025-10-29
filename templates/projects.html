@@ -1,18 +1,21 @@
 {{ template "header.html" . }}
 
-  <h1>
+  <h1 class="title">
     Projects
-    <a href="/EditProject/0" class="menu-button">Create project</a>
+    <a href="/EditProject/0" class="button is-small is-primary" style="float: right" title="Create new project">+</a>
   </h1>
 
-  <table>
+  <table class="table">
 
+    <thead>
     <tr>
         <th>Client</th>
         <th>Name</th>
         <th>Description</th>
     </tr>
+    </thead>
 
+    <tbody>
     {{ $lastDate := "" }}  <!-- for date breaks -->
     {{ range .projects }}
     <tr>
@@ -21,6 +24,7 @@
         <th>{{ .Description }}</th>
     </tr>
     {{ end }}
+    </tbody>
 
   </table>
 

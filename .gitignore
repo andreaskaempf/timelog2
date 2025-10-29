@@ -5,3 +5,4 @@ timelog.db
 
 old
 *.old
+static/bulma
