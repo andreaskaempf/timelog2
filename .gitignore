@@ -1,0 +1,7 @@
+go.sum
+timelog2
+timelog.db
+.vscode
+
+old
+*.old
