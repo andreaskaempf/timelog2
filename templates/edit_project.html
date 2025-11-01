@@ -65,6 +65,11 @@
           <button type="submit" class="button is-primary">Save</button>
         </div>
         <div class="control">
+          {{ if ne .project.Id 0 }}
+          <a href="/project/{{ .project.Id }}" class="button is-info">View</a>
+          {{ end }}
+        </div>
+        <div class="control">
           <a href="/projects" class="button is-light">Cancel</a>
         </div>
       </div>

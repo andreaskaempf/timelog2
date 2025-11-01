@@ -133,3 +133,21 @@ func saveProjectForm(c *gin.Context) {
 	// Redirect to the project page
 	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/project/%d", savedId))
 }
+
+// Handle deletion of a project
+func deleteProjectHandler(c *gin.Context) {
+
+	// Get project ID from URL
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid project ID")
+		return
+	}
+
+	// Delete the project (and all child records)
+	deleteProject(id)
+
+	// Redirect to projects list
+	c.Redirect(http.StatusSeeOther, "/projects")
+}

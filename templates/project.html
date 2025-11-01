@@ -3,8 +3,18 @@
   <h1 class="title">
     Project: {{ .project.Name }}
     <a href="/edit_project?id={{ .project.Id }}" class="button is-small is-primary" style="float: right; margin-left: 0.5em;" title="Edit project">Edit</a>
-    <a href="/projects" class="button is-small" style="float: right" title="Back to projects list">← Back</a>
+    <a href="/projects" class="button is-small" style="float: right; margin-left: 0.5em;" title="Back to projects list">← Back</a>
+    <button onclick="confirmDelete({{ .project.Id }}, this)" class="button is-small is-danger" style="float: right;" title="Delete project" data-project-name="{{ .project.Name }}">Delete</button>
   </h1>
+
+  <script>
+    function confirmDelete(id, button) {
+      var projectName = button.getAttribute('data-project-name');
+      if (confirm('Are you sure you want to delete project "' + projectName + '"?\n\nThis will also delete all work records associated with this project.\n\nThis action cannot be undone.')) {
+        window.location.href = '/delete_project/' + id;
+      }
+    }
+  </script>
 
   <div class="content">
     <table class="table">

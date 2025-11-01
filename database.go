@@ -150,3 +150,45 @@ func saveProject(p Project) int {
 	}
 	return p.Id
 }
+
+// Delete a project and all its child records (work and project_contact)
+func deleteProject(id int) {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Start a transaction
+	tx, err := db.Begin()
+	if err != nil {
+		panic("deleteProject begin: " + err.Error())
+	}
+
+	// Delete all work records for this project
+	_, err = tx.Exec("delete from work where project_id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		panic("deleteProject work: " + err.Error())
+	}
+
+	// Delete all project_contact records for this project
+	_, err = tx.Exec("delete from project_contact where project_id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		panic("deleteProject project_contact: " + err.Error())
+	}
+
+	// Delete the project itself
+	_, err = tx.Exec("delete from project where id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		panic("deleteProject project: " + err.Error())
+	}
+
+	// Commit the transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		panic("deleteProject commit: " + err.Error())
+	}
+}
