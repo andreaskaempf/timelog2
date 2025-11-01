@@ -1,0 +1,75 @@
+{{ template "header.html" . }}
+
+  <h1 class="title">
+    {{ if eq .project.Id 0 }}
+      Create New Project
+    {{ else }}
+      Edit Project: {{ .project.Name }}
+    {{ end }}
+    <a href="/projects" class="button is-small" style="float: right" title="Back to projects list">← Back</a>
+  </h1>
+
+  <div class="content">
+    <form method="post" action="/save_project">
+      <input type="hidden" name="id" value="{{ .project.Id }}">
+
+      <div class="field">
+        <label class="label">Client</label>
+        <div class="control">
+          <input class="input" type="text" name="client" value="{{ .project.Client }}" maxlength="32">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Name <span style="color: red;">*</span></label>
+        <div class="control">
+          <input class="input" type="text" name="name" value="{{ .project.Name }}" maxlength="32" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Description</label>
+        <div class="control">
+          <textarea class="textarea" name="description" rows="4">{{ .project.Description }}</textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Category</label>
+        <div class="control">
+          <div class="select">
+            <select name="category">
+              <option value="" {{ if eq .project.Category "" }}selected{{ end }}>-- Select Category --</option>
+              <option value="Billable" {{ if eq .project.Category "Billable" }}selected{{ end }}>Billable</option>
+              <option value="CD" {{ if eq .project.Category "CD" }}selected{{ end }}>CD</option>
+              <option value="IP" {{ if eq .project.Category "IP" }}selected{{ end }}>IP</option>
+              <option value="Training" {{ if eq .project.Category "Training" }}selected{{ end }}>Training</option>
+              <option value="Absent" {{ if eq .project.Category "Absent" }}selected{{ end }}>Absent</option>
+              <option value="Other" {{ if eq .project.Category "Other" }}selected{{ end }}>Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="control">
+          <label class="checkbox">
+            <input type="checkbox" name="active" {{ if .project.Active }}checked{{ end }}>
+            Active
+          </label>
+        </div>
+      </div>
+
+      <div class="field is-grouped">
+        <div class="control">
+          <button type="submit" class="button is-primary">Save</button>
+        </div>
+        <div class="control">
+          <a href="/projects" class="button is-light">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+{{ template "footer.html" .}}
+

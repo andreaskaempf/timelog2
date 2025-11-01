@@ -26,6 +26,34 @@ func dbConnect() *sql.DB {
 }
 
 //------------------------------------------------------------------//
+//                    G E N E R A L   U T I L I T I E S             //
+//------------------------------------------------------------------//
+
+// Get the maximum ID from a table
+// Returns 0 if the table is empty or has no rows
+// Note: tableName should be validated by the caller to prevent SQL injection
+func getMaxId(tableName string) int {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Execute query to get maximum ID
+	var maxId sql.NullInt64
+	query := fmt.Sprintf("select max(id) from %s", tableName)
+	err := db.QueryRow(query).Scan(&maxId)
+	if err != nil {
+		panic("getMaxId: " + err.Error())
+	}
+
+	// Return 0 if NULL (empty table), otherwise return the max ID
+	if !maxId.Valid {
+		return 0
+	}
+	return int(maxId.Int64)
+}
+
+//------------------------------------------------------------------//
 //                          P R O J E C T S                         //
 //------------------------------------------------------------------//
 
@@ -91,4 +119,34 @@ func getProject(id int) Project {
 
 	// Return project
 	return p
+}
+
+// Save a project (insert if Id is zero, update if Id is nonzero)
+// Returns the project ID
+func saveProject(p Project) int {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	if p.Id == 0 {
+		// Get next ID
+		nextId := getMaxId("project") + 1
+		p.Id = nextId
+
+		// Insert new project
+		_, err := db.Exec("insert into project (id, client, name, description, category, active) values (?, ?, ?, ?, ?, ?)",
+			p.Id, p.Client, p.Name, p.Description, p.Category, p.Active)
+		if err != nil {
+			panic("saveProject insert: " + err.Error())
+		}
+	} else {
+		// Update existing project
+		_, err := db.Exec("update project set client=?, name=?, description=?, category=?, active=? where id=?",
+			p.Client, p.Name, p.Description, p.Category, p.Active, p.Id)
+		if err != nil {
+			panic("saveProject update: " + err.Error())
+		}
+	}
+	return p.Id
 }
