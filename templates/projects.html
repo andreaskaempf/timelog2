@@ -20,7 +20,7 @@
     {{ range .projects }}
     <tr>
         <th>{{ .Client }}</th>
-        <th>{{ .Name }}</th>
+        <th><a href="/project/{{ .Id }}">{{ .Name }}</a></th>
         <th>{{ .Description }}</th>
     </tr>
     {{ end }}

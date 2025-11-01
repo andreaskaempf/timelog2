@@ -10,6 +10,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -68,4 +69,26 @@ func getProjects() []Project {
 
 	// Return list
 	return pp
+}
+
+// Get one project by ID
+func getProject(id int) Project {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Execute query to get one project
+	var p Project
+	err := db.QueryRow("select id, client, name, description, category, active from project where id = ?", id).
+		Scan(&p.Id, &p.Client, &p.Name, &p.Description, &p.Category, &p.Active)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			panic("getProject: project with id " + fmt.Sprintf("%d", id) + " not found")
+		}
+		panic("getProject: " + err.Error())
+	}
+
+	// Return project
+	return p
 }

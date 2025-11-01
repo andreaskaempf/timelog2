@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -44,6 +45,7 @@ func main() {
 	// Project pages
 	r.GET("/", showProjects)
 	r.GET("/projects", showProjects)
+	r.GET("/project/:id", showProject)
 	r.GET("/log", showLog)
 	r.GET("/contacts", showContacts)
 	r.GET("/reports", showReports)

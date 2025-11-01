@@ -3,6 +3,8 @@ package main
 import (
 	//"fmt"
 	"net/http"
+	"strconv"
+
 	//"sort"
 	//"strings"
 
@@ -25,4 +27,21 @@ func showProjects(c *gin.Context) {
 	c.HTML(http.StatusOK,
 		"projects.html",
 		gin.H{"projects": getProjects()})
+}
+
+// Page showing one project
+func showProject(c *gin.Context) {
+
+	// Get project ID from URL
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid project ID")
+		return
+	}
+
+	// Show the page
+	c.HTML(http.StatusOK,
+		"project.html",
+		gin.H{"project": getProject(id)})
 }
