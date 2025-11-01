@@ -5,6 +5,20 @@
     <a href="/edit_project?id=0" class="button is-small is-primary" style="float: right" title="Create new project">+</a>
   </h1>
 
+  <div class="tabs is-toggle">
+    <ul>
+      <li {{ if or (eq .filter "all") (not .filter) }}class="is-active"{{ end }}>
+        <a href="/projects?filter=all">All</a>
+      </li>
+      <li {{ if eq .filter "active" }}class="is-active"{{ end }}>
+        <a href="/projects?filter=active">Active</a>
+      </li>
+      <li {{ if eq .filter "inactive" }}class="is-active"{{ end }}>
+        <a href="/projects?filter=inactive">Inactive</a>
+      </li>
+    </ul>
+  </div>
+
   <table class="table">
 
     <thead>
@@ -18,7 +32,7 @@
     <tbody>
     {{ $lastDate := "" }}  <!-- for date breaks -->
     {{ range .projects }}
-    <tr>
+    <tr {{ if not .Active }}style="background-color: #f5f5f5;"{{ end }}>
         <th>{{ .Client }}</th>
         <th><a href="/project/{{ .Id }}">{{ .Name }}</a></th>
         <th>{{ .Description }}</th>

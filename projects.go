@@ -23,10 +23,41 @@ func showProjects(c *gin.Context) {
 	user := sess["user_name"]
 	uid := parseInt(sess["user_id"])*/
 
+	// Get filter from query string (all, active, inactive)
+	filter := c.Query("filter")
+	if filter == "" {
+		filter = "all"
+	}
+
+	// Get all projects
+	allProjects := getProjects()
+
+	// Filter projects based on filter parameter
+	var filteredProjects []Project
+	switch filter {
+	case "active":
+		for _, p := range allProjects {
+			if p.Active {
+				filteredProjects = append(filteredProjects, p)
+			}
+		}
+	case "inactive":
+		for _, p := range allProjects {
+			if !p.Active {
+				filteredProjects = append(filteredProjects, p)
+			}
+		}
+	default: // "all"
+		filteredProjects = allProjects
+	}
+
 	// Show the page as a table
 	c.HTML(http.StatusOK,
 		"projects.html",
-		gin.H{"projects": getProjects()})
+		gin.H{
+			"projects": filteredProjects,
+			"filter":   filter,
+		})
 }
 
 // Page showing one project
