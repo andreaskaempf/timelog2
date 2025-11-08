@@ -6,15 +6,51 @@
   </h1>
 
   <table class="table">
-
     <thead>
     <tr>
         <th>Date</th>
         <th>Project</th>
         <th>Hours</th>
+        <th>Description</th>
     </tr>
     </thead>
-
+    <tbody>
+    {{ range .entries }}
+    <tr>
+        <td><a href="/work_entry/{{ .Work.Id }}">{{ .Work.WorkDate }}</a></td>
+        <td>
+          {{ if .Work.ProjectId }}
+            <a href="/project/{{ .Work.ProjectId }}">{{ .Work.ProjectName }}</a>
+          {{ else }}
+            {{ .Work.ProjectName }}
+          {{ end }}
+        </td>
+        <td>{{ printf "%.2f" .Work.Hours }}</td>
+        <td>{{ .Work.Description }}</td>
+    </tr>
+    {{ if .ShowDayTotal }}
+    <tr class="has-background-grey-lighter">
+        <td colspan="2"><strong>Day Total ({{ .DayLabel }})</strong></td>
+        <td><strong>{{ printf "%.2f" .DayTotal }}</strong></td>
+        <td></td>
+    </tr>
+    {{ end }}
+    {{ if .ShowWeekTotal }}
+    <tr class="has-background-grey-light">
+        <td colspan="2"><strong>Week Total ({{ .WeekLabel }})</strong></td>
+        <td><strong>{{ printf "%.2f" .WeekTotal }}</strong></td>
+        <td></td>
+    </tr>
+    {{ end }}
+    {{ if .ShowMonthTotal }}
+    <tr class="has-background-grey">
+        <td colspan="2"><strong>Month Total ({{ .MonthLabel }})</strong></td>
+        <td><strong>{{ printf "%.2f" .MonthTotal }}</strong></td>
+        <td></td>
+    </tr>
+    {{ end }}
+    {{ end }}
+    </tbody>
   </table>
 
 {{ template "footer.html" .}}

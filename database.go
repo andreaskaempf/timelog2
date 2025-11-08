@@ -11,6 +11,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -191,4 +192,131 @@ func deleteProject(id int) {
 		tx.Rollback()
 		panic("deleteProject commit: " + err.Error())
 	}
+}
+
+//------------------------------------------------------------------//
+//                            W O R K                                //
+//------------------------------------------------------------------//
+
+// Record format for one work entry
+type Work struct {
+	Id          int
+	ProjectId   int
+	WorkDate    string // date as string
+	Hours       float64
+	Billable    bool
+	Description string
+	// Joined fields from project
+	ProjectName string
+	Client      string
+}
+
+// Cutoff year for work entries
+const cutoffDate = "2025-01-01"
+
+// Get all work entries, sorted by date (increasing)
+func getWorkEntries() []Work {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Execute query to get all work entries with project info
+	query := `select w.id, w.project_id, w.work_date, w.hours, w.billable, w.description,
+	          p.name as project_name, p.client
+	          from work w
+	          left join project p on w.project_id = p.id
+	          where w.work_date >= ?
+	          order by w.work_date, w.id`
+	rows, err := db.Query(query, cutoffDate)
+	if err != nil {
+		panic("getWorkEntries query: " + err.Error())
+	}
+	defer rows.Close()
+
+	// Collect into a list
+	ww := []Work{}
+	for rows.Next() {
+		w := Work{}
+		var hrs, billable string
+		err := rows.Scan(&w.Id, &w.ProjectId, &w.WorkDate, &hrs, &billable, &w.Description,
+			&w.ProjectName, &w.Client)
+		if err != nil {
+			panic("getWorkEntries next: " + err.Error())
+		}
+
+		// Convert some fields
+		if len(w.WorkDate) > 10 { // fix dates that include time (e.g., "2025-01-01T12:00:00")
+			w.WorkDate = w.WorkDate[:10]
+		}
+		w.Hours, err = strconv.ParseFloat(hrs, 64)
+		if err != nil {
+			fmt.Printf("getWorkEntries: invalid hours \"%s\"\n", hrs)
+			w.Hours = 0
+		}
+		w.Billable = billable == "1"
+
+		// Add to list
+		ww = append(ww, w)
+	}
+	if rows.Err() != nil {
+		panic("getWorkEntries exit: " + err.Error())
+	}
+
+	// Return list
+	fmt.Printf("getWorkEntries: %d rows\n", len(ww))
+	return ww
+}
+
+// Get one work entry by ID
+func getWorkEntry(id int) Work {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Execute query to get one work entry with project info
+	query := `select w.id, w.project_id, w.work_date, w.hours, w.billable, w.description,
+	          p.name as project_name, p.client
+	          from work w
+	          left join project p on w.project_id = p.id
+	          where w.id = ?`
+	var w Work
+	var workDate sql.NullString
+	var hours sql.NullFloat64
+	var billable sql.NullBool
+	var description sql.NullString
+	var projectName sql.NullString
+	var client sql.NullString
+
+	err := db.QueryRow(query, id).Scan(&w.Id, &w.ProjectId, &workDate, &hours, &billable, &description,
+		&projectName, &client)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			panic("getWorkEntry: work entry with id " + fmt.Sprintf("%d", id) + " not found")
+		}
+		panic("getWorkEntry: " + err.Error())
+	}
+
+	if workDate.Valid {
+		w.WorkDate = workDate.String
+	}
+	if hours.Valid {
+		w.Hours = hours.Float64
+	}
+	if billable.Valid {
+		w.Billable = billable.Bool
+	}
+	if description.Valid {
+		w.Description = description.String
+	}
+	if projectName.Valid {
+		w.ProjectName = projectName.String
+	}
+	if client.Valid {
+		w.Client = client.String
+	}
+
+	// Return work entry
+	return w
 }

@@ -1,0 +1,56 @@
+{{ template "header.html" . }}
+
+  <h1 class="title">
+    Work Entry: {{ .work.WorkDate }}
+    <a href="/log" class="button is-small" style="float: right" title="Back to log">← Back</a>
+  </h1>
+
+  <div class="content">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>ID</th>
+          <td>{{ .work.Id }}</td>
+        </tr>
+        <tr>
+          <th>Date</th>
+          <td>{{ .work.WorkDate }}</td>
+        </tr>
+        <tr>
+          <th>Project</th>
+          <td>
+            {{ if .work.ProjectId }}
+              <a href="/project/{{ .work.ProjectId }}">{{ .work.ProjectName }}</a>
+            {{ else }}
+              {{ .work.ProjectName }}
+            {{ end }}
+          </td>
+        </tr>
+        <tr>
+          <th>Client</th>
+          <td>{{ .work.Client }}</td>
+        </tr>
+        <tr>
+          <th>Hours</th>
+          <td>{{ printf "%.2f" .work.Hours }}</td>
+        </tr>
+        <tr>
+          <th>Billable</th>
+          <td>
+            {{ if .work.Billable }}
+              <span class="tag is-success">Yes</span>
+            {{ else }}
+              <span class="tag is-danger">No</span>
+            {{ end }}
+          </td>
+        </tr>
+        <tr>
+          <th>Description</th>
+          <td>{{ .work.Description }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+{{ template "footer.html" .}}
+
