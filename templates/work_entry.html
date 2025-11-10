@@ -2,8 +2,19 @@
 
   <h1 class="title">
     Work Entry: {{ .work.WorkDate }}
-    <a href="/log" class="button is-small" style="float: right" title="Back to log">← Back</a>
+    <a href="/log" class="button is-small" style="float: right; margin-left: 0.5em;" title="Back to log">← Back</a>
+    <button onclick="confirmDelete({{ .work.Id }}, this)" class="button is-small is-danger" style="float: right; margin-left: 0.5em;" title="Delete entry" data-work-label="Work #{{ .work.Id }} on {{ .work.WorkDate }}">Delete</button>
+    <a href="/edit_log/{{ .work.Id }}" class="button is-small is-primary" style="float: right;" title="Edit entry">Edit</a>
   </h1>
+
+  <script>
+    function confirmDelete(id, button) {
+      var label = button.getAttribute('data-work-label');
+      if (confirm('Delete ' + label + '?\n\nThis action cannot be undone.')) {
+        window.location.href = '/delete_work/' + id;
+      }
+    }
+  </script>
 
   <div class="content">
     <table class="table">

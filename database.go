@@ -320,3 +320,46 @@ func getWorkEntry(id int) Work {
 	// Return work entry
 	return w
 }
+
+// Delete one work entry by ID
+func deleteWork(id int) {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	_, err := db.Exec("delete from work where id = ?", id)
+	if err != nil {
+		panic("deleteWork: " + err.Error())
+	}
+}
+
+// Save a work entry (insert if Id is zero, update if Id is nonzero)
+// Returns the work ID
+func saveWork(w Work) int {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	if w.Id == 0 {
+		// Get next ID
+		nextId := getMaxId("work") + 1
+		w.Id = nextId
+
+		// Insert new work entry
+		_, err := db.Exec("insert into work (id, project_id, work_date, hours, billable, description) values (?, ?, ?, ?, ?, ?)",
+			w.Id, w.ProjectId, w.WorkDate, w.Hours, w.Billable, w.Description)
+		if err != nil {
+			panic("saveWork insert: " + err.Error())
+		}
+	} else {
+		// Update existing work entry
+		_, err := db.Exec("update work set project_id=?, work_date=?, hours=?, billable=?, description=? where id=?",
+			w.ProjectId, w.WorkDate, w.Hours, w.Billable, w.Description, w.Id)
+		if err != nil {
+			panic("saveWork update: " + err.Error())
+		}
+	}
+	return w.Id
+}

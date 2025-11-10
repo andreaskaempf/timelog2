@@ -133,3 +133,91 @@ func showWorkEntry(c *gin.Context) {
 		"work_entry.html",
 		gin.H{"work": getWorkEntry(id)})
 }
+
+// Page to create/edit a work entry
+func editWork(c *gin.Context) {
+
+	// ID from URL param (consistent with /edit_log/:id)
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid work entry ID")
+		return
+	}
+
+	var w Work
+	if id == 0 {
+		// New entry defaults
+		w = Work{
+			Id:        0,
+			WorkDate:  time.Now().Format("2006-01-02"),
+			Billable:  true,
+			Hours:     1.0,
+			ProjectId: 0,
+		}
+	} else {
+		w = getWorkEntry(id)
+	}
+
+	// Get active projects for dropdown
+	activeProjects := []Project{}
+	for _, p := range getProjects() {
+		if p.Active {
+			activeProjects = append(activeProjects, p)
+		}
+	}
+
+	c.HTML(http.StatusOK, "edit_work.html", gin.H{
+		"work":     w,
+		"projects": activeProjects,
+	})
+}
+
+// Handle save of a work entry
+func saveWorkForm(c *gin.Context) {
+
+	// Parse fields
+	id, _ := strconv.Atoi(c.PostForm("id"))
+	projectId, err := strconv.Atoi(c.PostForm("project_id"))
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid project")
+		return
+	}
+	workDate := c.PostForm("work_date")
+	hoursStr := c.PostForm("hours")
+	hours, err := strconv.ParseFloat(hoursStr, 64)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid hours")
+		return
+	}
+	billable := c.PostForm("billable") == "on" || c.PostForm("billable") == "true"
+	description := c.PostForm("description")
+
+	w := Work{
+		Id:          id,
+		ProjectId:   projectId,
+		WorkDate:    workDate,
+		Hours:       hours,
+		Billable:    billable,
+		Description: description,
+	}
+
+	savedId := saveWork(w)
+
+	// Redirect to work entry detail
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/work_entry/%d", savedId))
+}
+
+// Handle deletion of a work entry
+func deleteWorkHandler(c *gin.Context) {
+	// Get work entry ID from URL
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid work entry ID")
+		return
+	}
+	// Delete and redirect to log
+	deleteWork(id)
+	c.Redirect(http.StatusSeeOther, "/log")
+}
