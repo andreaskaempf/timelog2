@@ -321,6 +321,50 @@ func getWorkEntry(id int) Work {
 	return w
 }
 
+// Get work entries between dates [startDate, endDate] inclusive, sorted by date
+func getWorkEntriesBetween(startDate, endDate string) []Work {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Query with project info
+	query := `select w.id, w.project_id, w.work_date, w.hours, w.billable, w.description,
+	          p.name as project_name, p.client
+	          from work w
+	          left join project p on w.project_id = p.id
+	          where w.work_date >= ? and w.work_date <= ?
+	          order by w.work_date, w.id`
+	rows, err := db.Query(query, startDate, endDate)
+	if err != nil {
+		panic("getWorkEntriesBetween query: " + err.Error())
+	}
+	defer rows.Close()
+
+	entries := []Work{}
+	for rows.Next() {
+		w := Work{}
+		var hrs, billable string
+		err := rows.Scan(&w.Id, &w.ProjectId, &w.WorkDate, &hrs, &billable, &w.Description, &w.ProjectName, &w.Client)
+		if err != nil {
+			panic("getWorkEntriesBetween next: " + err.Error())
+		}
+		if len(w.WorkDate) > 10 {
+			w.WorkDate = w.WorkDate[:10]
+		}
+		w.Hours, err = strconv.ParseFloat(hrs, 64)
+		if err != nil {
+			w.Hours = 0
+		}
+		w.Billable = billable == "1"
+		entries = append(entries, w)
+	}
+	if rows.Err() != nil {
+		panic("getWorkEntriesBetween exit: " + err.Error())
+	}
+	return entries
+}
+
 // Delete one work entry by ID
 func deleteWork(id int) {
 

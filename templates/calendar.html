@@ -1,0 +1,55 @@
+{{ template "header.html" . }}
+
+  <h1 class="title">
+    {{ .monthName }}
+    <div style="float: right;">
+        <a href="/calendar?year={{ .prevYear }}&month={{ .prevMonth }}" 
+            class="button is-small" style="margin-left: 0.5em;" title="Previous month">← Prev</a>
+        <a href="/calendar?year={{ .nextYear }}&month={{ .nextMonth }}" 
+            class="button is-small" style="margin-left: 0.5em;" title="Next month">Next →</a>
+    </div>
+  </h1>
+
+  <table class="table is-fullwidth">
+    <thead>
+      <tr>
+        <th width="14%">Sun</th>
+        <th width="14%">Mon</th>
+        <th width="14%">Tue</th>
+        <th width="14%">Wed</th>
+        <th width="14%">Thu</th>
+        <th width="14%">Fri</th>
+        <th width="14%">Sat</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ $colors := .colors }}
+
+      {{ range .weeks }}
+      <tr>
+        {{ range . }}
+          {{ if . }}
+          <td style="vertical-align: top;">
+            <div><strong>{{ .Day }}</strong></div>
+            {{ range .Entries }}
+              <div style="margin-top: 0.25em;">
+                <a href="/work_entry/{{ .Id }}" 
+                    class="tag {{ index $colors .ProjectId }}" 
+                    title="{{ .Description }} ({{ .Hours }} hours)">
+                    {{ .ProjectName }}
+                </a>
+              </div>
+            {{ end }}
+          </td>
+          {{ else }}
+          <td></td>
+          {{ end }}
+        {{ end }}
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+
+{{ template "footer.html" .}}
+
+

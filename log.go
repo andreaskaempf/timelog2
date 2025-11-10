@@ -11,6 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CalendarDay represents one day and its work entries
+type CalendarDay struct {
+	Date    string
+	Day     int
+	Entries []Work
+}
+
 // LogEntryWithSubtotals contains a work entry and subtotal information
 type LogEntryWithSubtotals struct {
 	Work           Work
@@ -220,4 +227,108 @@ func deleteWorkHandler(c *gin.Context) {
 	// Delete and redirect to log
 	deleteWork(id)
 	c.Redirect(http.StatusSeeOther, "/log")
+}
+
+// Page: monthly calendar of work entries
+func showCalendar(c *gin.Context) {
+	// Parse year and month from query; default to current
+	now := time.Now()
+	year, _ := strconv.Atoi(c.DefaultQuery("year", fmt.Sprintf("%04d", now.Year())))
+	monthInt, _ := strconv.Atoi(c.DefaultQuery("month", fmt.Sprintf("%02d", int(now.Month()))))
+	if monthInt < 1 || monthInt > 12 {
+		monthInt = int(now.Month())
+	}
+	month := time.Month(monthInt)
+
+	firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
+	// Compute last day
+	firstNextMonth := firstOfMonth.AddDate(0, 1, 0)
+	lastOfMonth := firstNextMonth.AddDate(0, 0, -1)
+	daysInMonth := lastOfMonth.Day()
+
+	// Range strings
+	startDate := firstOfMonth.Format("2006-01-02")
+	endDate := lastOfMonth.Format("2006-01-02")
+
+	// Fetch entries in range
+	entries := getWorkEntriesBetween(startDate, endDate)
+
+	// Bucket entries by date
+	dayMap := map[string][]Work{}
+	for _, w := range entries {
+		dayMap[w.WorkDate] = append(dayMap[w.WorkDate], w)
+	}
+
+	// Prepare days slice
+	days := make([]CalendarDay, 0, daysInMonth)
+	for d := 1; d <= daysInMonth; d++ {
+		cur := time.Date(year, month, d, 0, 0, 0, 0, time.Local)
+		ds := cur.Format("2006-01-02")
+		days = append(days, CalendarDay{
+			Date:    ds,
+			Day:     d,
+			Entries: dayMap[ds],
+		})
+	}
+
+	// Weekday of first (0=Sunday .. 6=Saturday)
+	startWeekday := int(firstOfMonth.Weekday())
+
+	// Next/prev month routing
+	prev := firstOfMonth.AddDate(0, -1, 0)
+	next := firstOfMonth.AddDate(0, 1, 0)
+
+	// Build 6x7 grid of weeks with optional days
+	weeks := make([][]*CalendarDay, 0, 6)
+	curWeek := make([]*CalendarDay, 7)
+	// Fill leading blanks
+	for i := 0; i < startWeekday; i++ {
+		curWeek[i] = nil
+	}
+	col := startWeekday
+	for i := 0; i < len(days); i++ {
+		d := days[i]
+		curWeek[col] = &d
+		col++
+		if col == 7 {
+			weeks = append(weeks, curWeek)
+			curWeek = make([]*CalendarDay, 7)
+			col = 0
+		}
+	}
+	if col != 0 {
+		weeks = append(weeks, curWeek)
+	}
+
+	// Build project color map (stable palette)
+	palette := []string{
+		"is-primary", "is-link", "is-info", "is-success", "is-warning", "is-danger",
+		"is-dark", "is-black", "is-primary is-light", "is-link is-light", "is-info is-light",
+		"is-success is-light", "is-warning is-light", "is-danger is-light",
+	}
+	colors := map[int]string{}
+	for _, w := range entries {
+		if _, ok := colors[w.ProjectId]; !ok {
+			idx := w.ProjectId % len(palette)
+			if idx < 0 {
+				idx = -idx
+			}
+			colors[w.ProjectId] = palette[idx]
+		}
+	}
+
+	c.HTML(http.StatusOK, "calendar.html", gin.H{
+		"year":         year,
+		"month":        int(month),
+		"monthName":    firstOfMonth.Format("January 2006"),
+		"daysInMonth":  daysInMonth,
+		"startWeekday": startWeekday,
+		"days":         days,
+		"weeks":        weeks,
+		"prevYear":     prev.Year(),
+		"prevMonth":    int(prev.Month()),
+		"nextYear":     next.Year(),
+		"nextMonth":    int(next.Month()),
+		"colors":       colors,
+	})
 }
