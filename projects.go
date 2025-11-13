@@ -26,7 +26,7 @@ func showProjects(c *gin.Context) {
 	// Get filter from query string (all, active, inactive)
 	filter := c.Query("filter")
 	if filter == "" {
-		filter = "all"
+		filter = "active"
 	}
 
 	// Get all projects
@@ -71,10 +71,24 @@ func showProject(c *gin.Context) {
 		return
 	}
 
+	// Fetch project and related work entries
+	project := getProject(id)
+	entries := getWorkEntriesForProject(id)
+
+	totalHours := 0.0
+	for _, e := range entries {
+		totalHours += e.Hours
+	}
+
 	// Show the page
 	c.HTML(http.StatusOK,
 		"project.html",
-		gin.H{"project": getProject(id)})
+		gin.H{
+			"project":    project,
+			"entries":    entries,
+			"totalCount": len(entries),
+			"totalHours": totalHours,
+		})
 }
 
 // Page to edit a project (or create new one if id is 0)

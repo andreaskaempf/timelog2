@@ -365,6 +365,50 @@ func getWorkEntriesBetween(startDate, endDate string) []Work {
 	return entries
 }
 
+// Get all work entries for a specific project, sorted by date ascending
+func getWorkEntriesForProject(projectId int) []Work {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	query := `select w.id, w.project_id, w.work_date, w.hours, w.billable, w.description,
+	          p.name as project_name, p.client
+	          from work w
+	          left join project p on w.project_id = p.id
+	          where w.project_id = ?
+	          order by w.work_date, w.id`
+	rows, err := db.Query(query, projectId)
+	if err != nil {
+		panic("getWorkEntriesForProject query: " + err.Error())
+	}
+	defer rows.Close()
+
+	list := []Work{}
+	for rows.Next() {
+		w := Work{}
+		var hrs, billable string
+		err := rows.Scan(&w.Id, &w.ProjectId, &w.WorkDate, &hrs, &billable, &w.Description,
+			&w.ProjectName, &w.Client)
+		if err != nil {
+			panic("getWorkEntriesForProject next: " + err.Error())
+		}
+		if len(w.WorkDate) > 10 {
+			w.WorkDate = w.WorkDate[:10]
+		}
+		w.Hours, err = strconv.ParseFloat(hrs, 64)
+		if err != nil {
+			w.Hours = 0
+		}
+		w.Billable = billable == "1"
+		list = append(list, w)
+	}
+	if rows.Err() != nil {
+		panic("getWorkEntriesForProject exit: " + err.Error())
+	}
+	return list
+}
+
 // Delete one work entry by ID
 func deleteWork(id int) {
 
