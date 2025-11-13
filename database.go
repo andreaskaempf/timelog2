@@ -195,7 +195,7 @@ func deleteProject(id int) {
 }
 
 //------------------------------------------------------------------//
-//                            W O R K                                //
+//                            W O R K                               //
 //------------------------------------------------------------------//
 
 // Record format for one work entry
@@ -450,4 +450,76 @@ func saveWork(w Work) int {
 		}
 	}
 	return w.Id
+}
+
+//------------------------------------------------------------------//
+//                          C O N T A C T S                         //
+//------------------------------------------------------------------//
+
+// Record format for one contact
+type Contact struct {
+	Id        int
+	FirstName string
+	LastName  string
+	Company   string
+	Title     string
+	Source    string
+	Phones    string
+	Emails    string
+	Address   string
+	Comments  string
+	Active    bool
+}
+
+// Get all contacts, sorted by last name (increasing)
+func getContacts() []Contact {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Execute query to get all contacts
+	query := "select id, first_name, last_name, company, title, source, phones, emails, address, comments, active from contact order by last_name"
+	rows, err := db.Query(query)
+	if err != nil {
+		panic("getContacts query: " + err.Error())
+	}
+	defer rows.Close()
+
+	// Collect into a list
+	cc := []Contact{}
+	for rows.Next() {
+		c := Contact{}
+		err := rows.Scan(&c.Id, &c.FirstName, &c.LastName, &c.Company, &c.Title, &c.Source, &c.Phones, &c.Emails, &c.Address, &c.Comments, &c.Active)
+		if err != nil {
+			panic("getContacts next: " + err.Error())
+		}
+		cc = append(cc, c)
+	}
+	if rows.Err() != nil {
+		panic("getContacts exit: " + err.Error())
+	}
+
+	// Return list
+	fmt.Printf("getContacts: %d rows\n", len(cc))
+	return cc
+}
+
+// Get one contact by ID
+func getContact(id int) Contact {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Execute query to get one contact
+	query := "select select id, first_name, last_name, company, title, source, phones, emails, address, comments, active from contacts where id = ?"
+	var c Contact
+	err := db.QueryRow(query, id).Scan(&c.Id, &c.FirstName, &c.LastName, &c.Company, &c.Title, &c.Source, &c.Phones, &c.Emails, &c.Address, &c.Comments, &c.Active)
+	if err != nil {
+		panic("getContact: " + err.Error())
+	}
+
+	// Return work entry
+	return c
 }
