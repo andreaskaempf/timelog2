@@ -3,7 +3,7 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -57,34 +57,26 @@ func showContact(c *gin.Context) {
 		gin.H{"c": contact})
 }
 
-/*
 // Page to edit a contact (or create new one if id is 0)
 func editContact(c *gin.Context) {
 
-	// Get contact ID from query string
-	idStr := c.Query("id")
-	if idStr == "" {
-		idStr = "0"
-	}
+	// Get contact ID
+	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		c.String(http.StatusBadRequest, "Invalid contact ID")
 		return
 	}
 
-	var p Contact
-	if id == 0 {
-		// New contact - create empty contact
-		p = Contact{Id: 0, Client: "", Name: "", Description: "", Category: "", Active: true}
-	} else {
-		// Existing contact - get from database
-		p = getContact(id)
+	var cont Contact // new contact is blank by default
+	if id > 0 {      // Existing contact - get from database
+		cont = getContact(id)
 	}
 
 	// Show the edit page
 	c.HTML(http.StatusOK,
 		"edit_contact.html",
-		gin.H{"contact": p})
+		gin.H{"c": cont})
 }
 
 // Handle form submission to save a contact
@@ -99,17 +91,22 @@ func saveContactForm(c *gin.Context) {
 	}
 
 	// Get form values
-	p := Contact{
-		Id:          id,
-		Client:      c.PostForm("client"),
-		Name:        c.PostForm("name"),
-		Description: c.PostForm("description"),
-		Category:    c.PostForm("category"),
-		Active:      c.PostForm("active") == "on" || c.PostForm("active") == "true",
+	cont := Contact{
+		Id:        id,
+		FirstName: c.PostForm("first_name"),
+		LastName:  c.PostForm("last_name"),
+		Company:   c.PostForm("company"),
+		Title:     c.PostForm("title"),
+		Source:    c.PostForm("source"),
+		Phones:    c.PostForm("phones"),
+		Emails:    c.PostForm("emails"),
+		Address:   c.PostForm("address"),
+		Comments:  c.PostForm("comments"),
+		Active:    c.PostForm("active") == "on" || c.PostForm("active") == "true",
 	}
 
-	// Save the contact
-	savedId := saveContact(p)
+	// Save the contact (TODO: is ID assigned for new contacts?)
+	savedId := saveContact(cont)
 
 	// Redirect to the contact page
 	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contact/%d", savedId))
@@ -126,10 +123,9 @@ func deleteContactHandler(c *gin.Context) {
 		return
 	}
 
-	// Delete the contact (and all child records)
+	// Delete the contact (TODO: all child records)
 	deleteContact(id)
 
 	// Redirect to contacts list
 	c.Redirect(http.StatusSeeOther, "/contacts")
 }
-*/

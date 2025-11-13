@@ -523,3 +523,69 @@ func getContact(id int) Contact {
 	// Return work entry
 	return c
 }
+
+// Save a contact (insert if Id is zero, update if Id is nonzero)
+// Returns the contact ID
+func saveContact(c Contact) int {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	if c.Id == 0 {
+
+		// Get next ID
+		nextId := getMaxId("contact") + 1
+		c.Id = nextId
+
+		// Insert new contact
+		_, err := db.Exec("insert into contact (id, first_name, last_name, company, title, source, phones, emails, address, comments, active) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			c.Id, c.FirstName, c.LastName, c.Company, c.Title, c.Source, c.Phones, c.Emails, c.Address, c.Comments, c.Active)
+		if err != nil {
+			panic("saveContact insert: " + err.Error())
+		}
+	} else { // Update existing contact
+
+		_, err := db.Exec("update contact set first_name=?, last_name=?, company=?, title=?, source=?, phones=?, emails=?, address=?, comments=?, active=? where id=?",
+			c.FirstName, c.LastName, c.Company, c.Title, c.Source, c.Phones, c.Emails, c.Address, c.Comments, c.Active, c.Id)
+		if err != nil {
+			panic("saveContact update: " + err.Error())
+		}
+	}
+	return c.Id
+}
+
+// Delete a contact and all its child records (work and contact_contact)
+func deleteContact(id int) {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Start a transaction
+	tx, err := db.Begin()
+	if err != nil {
+		panic("deleteContact begin: " + err.Error())
+	}
+
+	// TODO: Delete all contact_project records for this contact
+	/*_, err = tx.Exec("delete from contact_contact where contact_id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		panic("deleteContact contact_contact: " + err.Error())
+	}*/
+
+	// Delete the contact itself
+	_, err = tx.Exec("delete from contact where id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		panic("deleteContact: " + err.Error())
+	}
+
+	// Commit the transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		panic("deleteContact commit: " + err.Error())
+	}
+}

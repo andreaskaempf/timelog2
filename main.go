@@ -50,25 +50,23 @@ func main() {
 	r.POST("/save_project", saveProjectForm)
 	r.GET("/delete_project/:id", deleteProjectHandler)
 
+	// Work history
 	r.GET("/log", showLog)
 	r.GET("/edit_log/:id", editWork)
 	r.POST("/save_work", saveWorkForm)
 	r.GET("/work_entry/:id", showWorkEntry)
 	r.GET("/delete_work/:id", deleteWorkHandler)
 
+	// Contacts
 	r.GET("/contacts", showContacts)
 	r.GET("/contact/:id", showContact)
+	r.GET("/edit_contact/:id", editContact)
+	r.POST("/save_contact", saveContactForm)
+	r.GET("/delete_contact/:id", deleteContactHandler)
 
+	// Other pages
 	r.GET("/reports", showReports)
 	r.GET("/calendar", showCalendar)
-
-	/*r.GET("/Person/:id", showPerson)
-	r.GET("/EditPerson/:id", editPerson)
-	r.POST("/update_person", savePerson)
-	r.GET("/SetPassword/:id", setPassword)
-	r.POST("/set_password", setPassword2)
-	r.GET("/DelPerson/:id", delPerson)
-	r.GET("/UnlockPerson/:id", unlockPerson)*/
 
 	// Start server, on non-default port
 	fmt.Println("Running on port 8222")

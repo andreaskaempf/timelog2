@@ -1,0 +1,99 @@
+{{ template "header.html" . }}
+
+  <h1 class="title">
+    {{ if eq .project.Id 0 }}
+      Create New Contact
+    {{ else }}
+      Edit Contact
+    {{ end }}
+  </h1>
+
+  <div class="content">
+    <form method="post" action="/save_contact">
+      <input type="hidden" name="id" value="{{ .c.Id }}">
+
+      <div class="field">
+        <label class="label">First name <span style="color: red;">*</span></label>
+        <div class="control">
+          <input class="input" type="text" name="first_name" value="{{ .c.FirstName }}" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Last name <span style="color: red;">*</span></label>
+        <div class="control">
+          <input class="input" type="text" name="last_name" value="{{ .c.LastName }}" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Company</label>
+        <div class="control">
+          <input class="input" type="text" name="company" value="{{ .c.Company }}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Title</label>
+        <div class="control">
+          <input class="input" type="text" name="title" value="{{ .c.Title }}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Source</label>
+        <div class="control">
+          <input class="input" type="text" name="source" value="{{ .c.Source }}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Phone number(s)</label>
+        <div class="control">
+          <input class="input" type="text" name="phones" value="{{ .c.Phones }}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Email address(es)</label>
+        <div class="control">
+          <input class="input" type="text" name="emails" value="{{ .c.Emails }}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Address</label>
+        <div class="control">
+          <input class="input" type="text" name="address" value="{{ .c.Address }}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Comments</label>
+        <div class="control">
+          <textarea class="textarea" name="comments" rows="4">{{ .c.Comments }}</textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="control">
+          <label class="checkbox">
+            <input type="checkbox" name="active" {{ if .c.Active }}checked{{ end }}>
+            Active
+          </label>
+        </div>
+      </div>
+
+      <div class="field is-grouped">
+        <div class="control">
+          <button type="submit" class="button is-primary">Save</button>
+        </div>
+        <div class="control">
+          <a href="/contacts" class="button is-light">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+{{ template "footer.html" .}}
+
