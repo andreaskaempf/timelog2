@@ -1,0 +1,70 @@
+{{ template "header.html" . }}
+
+  <h1 class="title">
+    {{ .c.FirstName }} {{ .c.LastName }}
+    <div style="float: right">
+      <a href="/edit_contact?id={{ .c.Id }}" class="button is-small is-primary" style="margin-right: 0.5em;">Edit</a>
+      <button onclick="confirmDelete({{ .c.Id }}, this)" class="button is-small is-danger">Delete</button>
+  </h1>
+
+  <script>
+    function confirmDelete(id, button) {
+      var contactName = button.getAttribute('data-contact-name');
+      if (confirm('Are you sure you want to delete contact "' + contactName + '"?\n\nThis will also delete all work records associated with this contact.\n\nThis action cannot be undone.')) {
+        window.location.href = '/delete_contact/' + id;
+      }
+    }
+  </script>
+
+  <div class="content">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Name</th>
+          <td>{{ .c.FirstName }} {{ .c.LastName }}</td>
+        </tr>
+        <tr>
+          <th>Company</th>
+          <td>{{ .c.Company }}</td>
+        </tr>
+        <tr>
+          <th>Title</th>
+          <td>{{ .c.Title }}</td>
+        </tr>
+        <tr>
+          <th>Source</th>
+          <td>{{ .c.Source }}</td>
+        </tr>
+        <tr>
+          <th>Phone(s)</th>
+          <td>{{ .c.Phones }}</td>
+        </tr>
+        <tr>
+          <th>Email(s)</th>
+          <td>{{ .c.Emails }}</td>
+        </tr>
+        <tr>
+          <th>Address</th>
+          <td>{{ .c.Emails }}</td>
+        </tr>
+        <tr>
+          <th>Comments</th>
+          <td>{{ .c.Comments }}</td>
+        </tr>
+        <tr>
+          <th>Active</th>
+          <td>
+            {{ if .c.Active }}
+              <span class="tag is-success">Active</span>
+            {{ else }}
+              <span class="tag is-danger">Inactive</span>
+            {{ end }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+{{ template "footer.html" .}}
+

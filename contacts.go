@@ -54,7 +54,7 @@ func showContact(c *gin.Context) {
 	// Show the page
 	c.HTML(http.StatusOK,
 		"contact.html",
-		gin.H{"contact": contact})
+		gin.H{"c": contact})
 }
 
 /*

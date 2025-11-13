@@ -513,7 +513,7 @@ func getContact(id int) Contact {
 	defer db.Close()
 
 	// Execute query to get one contact
-	query := "select select id, first_name, last_name, company, title, source, phones, emails, address, comments, active from contacts where id = ?"
+	query := "select id, first_name, last_name, company, title, source, phones, emails, address, comments, active from contact where id = ?"
 	var c Contact
 	err := db.QueryRow(query, id).Scan(&c.Id, &c.FirstName, &c.LastName, &c.Company, &c.Title, &c.Source, &c.Phones, &c.Emails, &c.Address, &c.Comments, &c.Active)
 	if err != nil {

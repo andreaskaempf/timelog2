@@ -57,6 +57,7 @@ func main() {
 	r.GET("/delete_work/:id", deleteWorkHandler)
 
 	r.GET("/contacts", showContacts)
+	r.GET("/contact/:id", showContact)
 
 	r.GET("/reports", showReports)
 	r.GET("/calendar", showCalendar)
