@@ -12,6 +12,7 @@
         <th>Name</th>
         <th>Organization, title</th>
         <th>Source</th>
+        <th>Comments</th>
     </tr>
     </thead>
 
@@ -21,6 +22,7 @@
         <th><a href="/contact/{{ .Id }}">{{ .FirstName }} {{ .LastName }}</a></th>
         <th>{{ .Company }}, {{ .Title }}</th>
         <th>{{ .Source }}</th>
+        <th>{{ .Comments }}</th>
     </tr>
     {{ end }}
     </tbody>

@@ -1,12 +1,7 @@
 {{ template "header.html" . }}
 
   <h1 class="title">
-    {{ if eq .work.Id 0 }}
-      Add Log Entry
-    {{ else }}
-      Edit Log Entry #{{ .work.Id }}
-    {{ end }}
-    <a href="/log" class="button is-small" style="float: right" title="Back to log">← Back</a>
+    {{ if eq .work.Id 0 }}New{{ else }}Edit{{ end }} Log Entry
   </h1>
 
   <div class="content">
@@ -74,5 +69,4 @@
   </div>
 
 {{ template "footer.html" .}}
-
 

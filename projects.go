@@ -84,7 +84,7 @@ func showProject(c *gin.Context) {
 	c.HTML(http.StatusOK,
 		"project.html",
 		gin.H{
-			"project":    project,
+			"p":          project,
 			"entries":    entries,
 			"totalCount": len(entries),
 			"totalHours": totalHours,
@@ -94,8 +94,8 @@ func showProject(c *gin.Context) {
 // Page to edit a project (or create new one if id is 0)
 func editProject(c *gin.Context) {
 
-	// Get project ID from query string
-	idStr := c.Query("id")
+	// Get project ID
+	idStr := c.Param("id")
 	if idStr == "" {
 		idStr = "0"
 	}
