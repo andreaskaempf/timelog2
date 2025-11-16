@@ -1,0 +1,5 @@
+Projects page: show total hours, earliest/latest date
+Menu: highlight current
+Warn if static/bulma missing
+Change colours of buttons to blue instead of turquoise
+Make text in tables regular instead of boldface
