@@ -10,7 +10,8 @@
     </div>
   </h1>
 
-  <table class="table is-fullwidth">
+  <table class="table is-fullwidth is-bordered">
+
     <thead>
       <tr>
         <th width="14%">Sun</th>
@@ -22,14 +23,15 @@
         <th width="14%">Sat</th>
       </tr>
     </thead>
+
     <tbody>
       {{ $colors := .colors }}
 
       {{ range .weeks }}
-      <tr>
+      <tr style="height: 100px">
         {{ range . }}
           {{ if . }}
-          <td style="vertical-align: top;">
+          <td style="vertical-align: top">
             <div><strong>{{ .Day }}</strong></div>
             {{ range .Entries }}
               <div style="margin-top: 0.25em;">

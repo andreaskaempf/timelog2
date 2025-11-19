@@ -46,7 +46,7 @@ func main() {
 	r.GET("/", showProjects)
 	r.GET("/projects", showProjects)
 	r.GET("/project/:id", showProject)
-	r.GET("/edit_project", editProject)
+	r.GET("/edit_project/:id", editProject)
 	r.POST("/save_project", saveProjectForm)
 	r.GET("/delete_project/:id", deleteProjectHandler)
 
