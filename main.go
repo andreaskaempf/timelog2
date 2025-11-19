@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -8,9 +9,6 @@ import (
 )
 
 func main() {
-	for _, p := range getProjects() {
-		fmt.Printf("%+v\n", p)
-	}
 
 	// Make sure sessions directory exists under /tmp, create if necessary
 	/*if !checkSessionsDir() {
@@ -28,6 +26,14 @@ func main() {
 	if !devMode {
 		fmt.Println("Host name is", host, "- running in production mode")
 		gin.SetMode(gin.ReleaseMode)
+	}
+
+	// Check if Bulma exists, since it needs to be installed by user
+	bulmaFile := "static/bulma/css/bulma.css"
+	_, err1 := os.Stat(bulmaFile)
+	if errors.Is(err1, os.ErrNotExist) {
+		fmt.Println("Bulma does not seem to be installed, could not find", bulmaFile)
+		return
 	}
 
 	// Create router, initialize templates and location of static files

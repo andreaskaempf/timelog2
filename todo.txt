@@ -1,4 +1,3 @@
-Warn if static/bulma missing
 Reports: time sheet, yearly summary, breakdown by activity type
 
 DONE
@@ -6,3 +5,4 @@ Edit project
 Menu: highlight current
 Projects page: add column with #entries, total hours, earliest/latest date
 Assign contacts to projects
+Warn if static/bulma missing
