@@ -4,44 +4,43 @@
     {{ if eq .work.Id 0 }}New{{ else }}Edit{{ end }} Log Entry
   </h1>
 
-  <div class="content">
-    <form method="post" action="/save_work">
-      <input type="hidden" name="id" value="{{ .work.Id }}">
 
-      <div class="field">
-        <label class="label">Date</label>
-        <div class="control">
-          <input class="input" type="date" name="work_date" value="{{ .work.WorkDate }}" required>
+  <form method="post" action="/save_work">
+
+    <input type="hidden" name="id" value="{{ .work.Id }}">
+
+    <div class="field">
+      <label class="label" >Date</label>
+      <div class="field-body">
+        <input class="input" type="date" name="work_date" value="{{ .work.WorkDate }}" required />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Project</label>
+      <div class="control">
+        <div class="select">
+          <select name="project_id" required>
+            <option value="">-- Select Project --</option>
+            {{ range .projects }}
+            <option value="{{ .Id }}" {{ if eq $.work.ProjectId .Id }}selected{{ end }}>{{ .Client }} - {{ .Name }}</option>
+            {{ end }}
+          </select>
         </div>
       </div>
-
-      <div class="field">
-        <label class="label">Project</label>
-        <div class="control">
-          <div class="select">
-            <select name="project_id" required>
-              <option value="">-- Select Project --</option>
-              {{ range .projects }}
-                <option value="{{ .Id }}" {{ if eq $.work.ProjectId .Id }}selected{{ end }}>{{ .Client }} - {{ .Name }}</option>
-              {{ end }}
-            </select>
-          </div>
-        </div>
-      </div>
+    </div>
 
       <div class="field">
         <label class="label">Hours</label>
         <div class="control">
-          <input class="input" type="number" name="hours" value="{{ printf "%.2f" .work.Hours }}" min="0" step="0.25" required>
+          <input class="input" type="number" name="hours" value="{{ printf "%.2f" .work.Hours }}" required />
         </div>
       </div>
 
       <div class="field">
+        <label class="label">Billable</label>
         <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" name="billable" {{ if .work.Billable }}checked{{ end }}>
-            Billable
-          </label>
+          <input type="checkbox" name="billable" {{ if .work.Billable }}checked{{ end }} />
         </div>
       </div>
 
@@ -66,7 +65,6 @@
         </div>
       </div>
     </form>
-  </div>
 
 {{ template "footer.html" .}}
 

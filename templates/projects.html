@@ -33,9 +33,9 @@
     {{ $lastDate := "" }}  <!-- for date breaks -->
     {{ range .projects }}
     <tr {{ if not .Active }}style="background-color: #f5f5f5;"{{ end }}>
-        <th>{{ .Client }}</th>
-        <th><a href="/project/{{ .Id }}">{{ .Name }}</a></th>
-        <th>{{ .Description }}</th>
+        <td>{{ .Client }}</td>
+        <td><a href="/project/{{ .Id }}">{{ .Name }}</a></td>
+        <td>{{ .Description }}</td>
     </tr>
     {{ end }}
     </tbody>
