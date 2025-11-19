@@ -57,6 +57,7 @@ func showProjects(c *gin.Context) {
 		gin.H{
 			"projects": filteredProjects,
 			"filter":   filter,
+			"current":  "projects",
 		})
 }
 
@@ -88,6 +89,7 @@ func showProject(c *gin.Context) {
 			"entries":    entries,
 			"totalCount": len(entries),
 			"totalHours": totalHours,
+			"current":    "projects",
 		})
 }
 
@@ -117,7 +119,7 @@ func editProject(c *gin.Context) {
 	// Show the edit page
 	c.HTML(http.StatusOK,
 		"edit_project.html",
-		gin.H{"project": p})
+		gin.H{"project": p, "current": "projects"})
 }
 
 // Handle form submission to save a project

@@ -34,7 +34,7 @@ func showContacts(c *gin.Context) {
 	// Show the page as a table
 	c.HTML(http.StatusOK,
 		"contacts.html",
-		gin.H{"contacts": allContacts})
+		gin.H{"contacts": allContacts, "current": "contacts"})
 }
 
 // Page showing one contact
@@ -54,7 +54,7 @@ func showContact(c *gin.Context) {
 	// Show the page
 	c.HTML(http.StatusOK,
 		"contact.html",
-		gin.H{"c": contact})
+		gin.H{"c": contact, "current": "contacts"})
 }
 
 // Page to edit a contact (or create new one if id is 0)
@@ -76,7 +76,7 @@ func editContact(c *gin.Context) {
 	// Show the edit page
 	c.HTML(http.StatusOK,
 		"edit_contact.html",
-		gin.H{"c": cont})
+		gin.H{"c": cont, "current": "contacts"})
 }
 
 // Handle form submission to save a contact

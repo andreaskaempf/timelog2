@@ -121,7 +121,7 @@ func showLog(c *gin.Context) {
 	// Show the page
 	c.HTML(http.StatusOK,
 		"log.html",
-		gin.H{"entries": logEntries})
+		gin.H{"entries": logEntries, "current": "log"})
 }
 
 // Page showing one work entry detail
@@ -138,7 +138,7 @@ func showWorkEntry(c *gin.Context) {
 	// Show the page
 	c.HTML(http.StatusOK,
 		"work_entry.html",
-		gin.H{"work": getWorkEntry(id)})
+		gin.H{"work": getWorkEntry(id), "current": "log"})
 }
 
 // Page to create/edit a work entry
@@ -177,6 +177,7 @@ func editWork(c *gin.Context) {
 	c.HTML(http.StatusOK, "edit_work.html", gin.H{
 		"work":     w,
 		"projects": activeProjects,
+		"current":  "log",
 	})
 }
 
@@ -330,5 +331,6 @@ func showCalendar(c *gin.Context) {
 		"nextYear":     next.Year(),
 		"nextMonth":    int(next.Month()),
 		"colors":       colors,
+		"current":      "calendar",
 	})
 }

@@ -9,5 +9,6 @@ import (
 
 // Page showing reports menu
 func showReports(c *gin.Context) {
-	c.HTML(http.StatusOK, "reports.html", gin.H{"log": 0})
+	c.HTML(http.StatusOK, "reports.html",
+		gin.H{"current": "reports"})
 }
