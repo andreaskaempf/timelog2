@@ -19,3 +19,10 @@ function confirmWorkDeletion(id) {
         window.location.href = '/delete_work/' + id;
     }
 }
+
+// Confirm deletion of project/contact link
+function confirmProjectLinkDeletion(contactId, projectId, projectName) {
+    if ( confirm('Remove link to project "' + projectName + '"?') ) {
+        window.location.href = '/del_contact_project?cid=' + contactId + '&pid=' + projectId;
+    }
+}

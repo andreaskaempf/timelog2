@@ -64,6 +64,10 @@ func main() {
 	r.POST("/save_contact", saveContactForm)
 	r.GET("/delete_contact/:id", deleteContactHandler)
 
+	// Contact-Project linking
+	r.POST("/add_contact_project/:contact_id", addContactProjectLink)
+	r.GET("/del_contact_project", deleteContactProjectLink)
+
 	// Other pages
 	r.GET("/reports", showReports)
 	r.GET("/calendar", showCalendar)

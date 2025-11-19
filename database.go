@@ -592,10 +592,141 @@ func deleteContact(id int) {
 		panic("deleteContact: " + err.Error())
 	}
 
+	// Delete all project_contact records for this contact
+	_, err = tx.Exec("delete from project_contact where contact_id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		panic("deleteContact project_contact: " + err.Error())
+	}
+
 	// Commit the transaction
 	err = tx.Commit()
 	if err != nil {
 		tx.Rollback()
 		panic("deleteContact commit: " + err.Error())
+	}
+}
+
+//------------------------------------------------------------------//
+//              P R O J E C T - C O N T A C T   L I N K S          //
+//------------------------------------------------------------------//
+
+// Get all projects linked to a contact
+func getProjectsForContact(contactId int) []Project {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Query to get projects linked to this contact
+	query := `select p.id, p.client, p.name, p.description, p.category, p.active
+	          from project p
+	          inner join project_contact pc on p.id = pc.project_id
+	          where pc.contact_id = ?
+	          order by p.client, p.name`
+	rows, err := db.Query(query, contactId)
+	if err != nil {
+		panic("getProjectsForContact query: " + err.Error())
+	}
+	defer rows.Close()
+
+	// Collect into a list
+	projects := []Project{}
+	for rows.Next() {
+		p := Project{}
+		err := rows.Scan(&p.Id, &p.Client, &p.Name, &p.Description, &p.Category, &p.Active)
+		if err != nil {
+			panic("getProjectsForContact next: " + err.Error())
+		}
+		projects = append(projects, p)
+	}
+	if rows.Err() != nil {
+		panic("getProjectsForContact exit: " + err.Error())
+	}
+
+	return projects
+}
+
+// Get all contacts linked to a project
+func getContactsForProject(projectId int) []Contact {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Query to get contacts linked to this project
+	query := `select c.id, c.first_name, c.last_name, c.company, c.title, c.source,
+	          c.phones, c.emails, c.address, c.comments, c.active
+	          from contact c
+	          inner join project_contact pc on c.id = pc.contact_id
+	          where pc.project_id = ?
+	          order by c.last_name, c.first_name`
+	rows, err := db.Query(query, projectId)
+	if err != nil {
+		panic("getContactsForProject query: " + err.Error())
+	}
+	defer rows.Close()
+
+	// Collect into a list
+	contacts := []Contact{}
+	for rows.Next() {
+		c := Contact{}
+		err := rows.Scan(&c.Id, &c.FirstName, &c.LastName, &c.Company, &c.Title,
+			&c.Source, &c.Phones, &c.Emails, &c.Address, &c.Comments, &c.Active)
+		if err != nil {
+			panic("getContactsForProject next: " + err.Error())
+		}
+		contacts = append(contacts, c)
+	}
+	if rows.Err() != nil {
+		panic("getContactsForProject exit: " + err.Error())
+	}
+
+	return contacts
+}
+
+// Link a project to a contact
+func addProjectContact(projectId, contactId int) {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Check if link already exists
+	var count int
+	err := db.QueryRow("select count(*) from project_contact where project_id = ? and contact_id = ?",
+		projectId, contactId).Scan(&count)
+	if err != nil {
+		panic("addProjectContact check: " + err.Error())
+	}
+
+	// If link already exists, do nothing
+	if count > 0 {
+		return
+	}
+
+	// Get next ID
+	nextId := getMaxId("project_contact") + 1
+
+	// Insert the link
+	_, err = db.Exec("insert into project_contact (id, project_id, contact_id) values (?, ?, ?)",
+		nextId, projectId, contactId)
+	if err != nil {
+		panic("addProjectContact insert: " + err.Error())
+	}
+}
+
+// Unlink a project from a contact
+func deleteProjectContact(projectId, contactId int) {
+
+	// Connect to database
+	db := dbConnect()
+	defer db.Close()
+
+	// Delete the link
+	_, err := db.Exec("delete from project_contact where project_id = ? and contact_id = ?",
+		projectId, contactId)
+	if err != nil {
+		panic("deleteProjectContact: " + err.Error())
 	}
 }

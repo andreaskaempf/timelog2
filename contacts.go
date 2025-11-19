@@ -37,7 +37,7 @@ func showContacts(c *gin.Context) {
 		gin.H{"contacts": allContacts, "current": "contacts"})
 }
 
-// Page showing one contact
+// Page showing one contact, with all the projects linked to
 func showContact(c *gin.Context) {
 
 	// Get contact ID from URL
@@ -51,10 +51,32 @@ func showContact(c *gin.Context) {
 	// Fetch contact
 	contact := getContact(id)
 
+	// Fetch linked projects for this contact
+	contactProjects := getProjectsForContact(id)
+
+	// Get all active projects that the contact is not yet linked to, for the dropdown (to link new ones)
+	allProjects := getProjects()
+	newProjects := []Project{}
+	for _, p := range allProjects {
+		if !p.Active {
+			continue
+		}
+		already := false
+		for _, q := range contactProjects {
+			if p.Id == q.Id {
+				already = true
+				break
+			}
+		}
+		if !already {
+			newProjects = append(newProjects, p)
+		}
+	}
+
 	// Show the page
 	c.HTML(http.StatusOK,
 		"contact.html",
-		gin.H{"c": contact, "current": "contacts"})
+		gin.H{"c": contact, "projects": contactProjects, "newProjects": newProjects, "current": "contacts"})
 }
 
 // Page to edit a contact (or create new one if id is 0)
@@ -128,4 +150,55 @@ func deleteContactHandler(c *gin.Context) {
 
 	// Redirect to contacts list
 	c.Redirect(http.StatusSeeOther, "/contacts")
+}
+
+// Handle adding a project link to a contact
+func addContactProjectLink(c *gin.Context) {
+
+	// Get contact ID from URL
+	contactIdStr := c.Param("contact_id")
+	contactId, err := strconv.Atoi(contactIdStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid contact ID")
+		return
+	}
+
+	// Get project ID from form
+	projectIdStr := c.PostForm("project_id")
+	projectId, err := strconv.Atoi(projectIdStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid project ID")
+		return
+	}
+
+	// Add the link
+	addProjectContact(projectId, contactId)
+
+	// Redirect back to the contact page
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contact/%d", contactId))
+}
+
+// Handle removing a project link from a contact
+func deleteContactProjectLink(c *gin.Context) {
+
+	// Get contact ID and project ID from URL query string
+	contactIdStr := c.Query("cid")
+	contactId, err := strconv.Atoi(contactIdStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid contact ID")
+		return
+	}
+
+	projectIdStr := c.Query("pid")
+	projectId, err := strconv.Atoi(projectIdStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid project ID")
+		return
+	}
+
+	// Delete the link
+	deleteProjectContact(projectId, contactId)
+
+	// Redirect back to the contact page
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contact/%d", contactId))
 }

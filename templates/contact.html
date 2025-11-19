@@ -56,6 +56,51 @@
       </tbody>
     </table>
 
+    <h2 class="subtitle" style="margin-top: 2rem;">Linked Projects</h2>
+    {{ if .projects }}
+    <table class="table is-fullwidth">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Client</th>
+          <th style="width: 30%;">Project</th>
+          <th style="width: 30%;">Category</th>
+          <th style="width: 10%;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .projects }}
+        <tr>
+          <td><a href="/project/{{ .Id }}">{{ .Client }}</a></td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Category }}</td>
+          <td><button onclick="confirmProjectLinkDeletion({{ $.c.Id }}, {{ .Id }}, '{{ .Name }}')"
+                class="button is-small is-danger is-light">Remove</button></td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+    {{ else }}
+    <p>No projects linked to this contact yet.</p>
+    {{ end }}
+
+    {{ if .newProjects }}
+    <div style="margin-top: 1rem;">
+      <form action="/add_contact_project/{{ .c.Id }}" method="POST" style="display: flex; gap: 0.5rem; align-items: center;">
+        <div class="select">
+          <select name="project_id" required>
+            <option value="">Select a project...</option>
+            {{ range .newProjects }}
+            <option value="{{ .Id }}">{{ .Client }} - {{ .Name }}</option>
+            {{ end }}
+          </select>
+        </div>
+        <button type="submit" class="button is-small is-primary">Link Project</button>
+      </form>
+    </div>
+    {{ else }}
+    <p>No projects available for this contact to link to.</p>
+    {{ end }}
+
   </div>
 
 {{ template "footer.html" .}}
