@@ -2,7 +2,7 @@
 
   <h1 class="title">
     Projects
-    <a href="/edit_project?id=0" class="button is-small is-primary" style="float: right" title="Create new project">+</a>
+    <a href="/edit_project/0" class="button is-small is-primary" style="float: right" title="Create new project">+</a>
   </h1>
 
   <div class="tabs is-toggle">
@@ -26,6 +26,8 @@
         <th>Client</th>
         <th>Name</th>
         <th>Description</th>
+        <th style="width: 220px">Dates</th>
+        <th style="width: 120px">Hours (Entries)</th>
     </tr>
     </thead>
 
@@ -36,6 +38,8 @@
         <td>{{ .Client }}</td>
         <td><a href="/project/{{ .Id }}">{{ .Name }}</a></td>
         <td>{{ .Description }}</td>
+        <td>{{ .Earliest }} to {{ .Latest }}</td>
+        <td>{{ .Hours }} ({{ .Logs }})</td>
     </tr>
     {{ end }}
     </tbody>

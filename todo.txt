@@ -1,7 +1,8 @@
-Projects page: add column with #entries, total hours, earliest/latest date
 Warn if static/bulma missing
 Assign contacts to projects
+Reports: time sheet, yearly summary, breakdown by activity type
 
 DONE
 Edit project
 Menu: highlight current
+Projects page: add column with #entries, total hours, earliest/latest date

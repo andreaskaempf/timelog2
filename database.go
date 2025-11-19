@@ -66,6 +66,10 @@ type Project struct {
 	Description string
 	Category    string // Billable, CD, IP, Training, Absent, Other
 	Active      bool
+	// The following fields are calculated
+	Logs             int     // number of work entries
+	Earliest, Latest string  // earliest & latest date
+	Hours            float64 // total hours
 }
 
 // Get a list of all projects, sorted by client, name
@@ -76,7 +80,13 @@ func getProjects() []Project {
 	defer db.Close()
 
 	// Execute query to get all projects
-	rows, err := db.Query("select id, client, name, description, category, active from project order by client, name")
+	//rows, err := db.Query("select id, client, name, description, category, active from project order by client, name")
+	q := "select p.id, p.client, p.name, p.description, p.category, p.active, "
+	q += "coalesce(min(w.work_date), 'n/a'), coalesce(max(w.work_date), 'n/a'), coalesce(count(w.id), 0), coalesce(sum(w.hours), 0) "
+	q += "from project as p left outer join work as w on p.id = w.project_id "
+	q += "group by p.id " // p.client, p.name, p.description, p.category, p.active "
+	q += "order by p.client, p.name"
+	rows, err := db.Query(q)
 	if err != nil {
 		panic("getProjects query: " + err.Error())
 	}
@@ -86,7 +96,7 @@ func getProjects() []Project {
 	pp := []Project{}
 	for rows.Next() {
 		p := Project{}
-		err := rows.Scan(&p.Id, &p.Client, &p.Name, &p.Description, &p.Category, &p.Active)
+		err := rows.Scan(&p.Id, &p.Client, &p.Name, &p.Description, &p.Category, &p.Active, &p.Earliest, &p.Latest, &p.Logs, &p.Hours)
 		if err != nil {
 			panic("getProjects next: " + err.Error())
 		}
